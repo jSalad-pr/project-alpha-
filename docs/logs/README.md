@@ -1,0 +1,1 @@
+The development logs document the evolution of Project Alpha from a repurposed consumer laptop into a documented Linux infrastructure platform. Rather than capturing every individual command or configuration change, each log represents a significant engineering milestone in the project's lifecycle.
