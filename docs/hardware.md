@@ -1,83 +1,35 @@
-# Hardware
+# Project Alpha Hardware
 
-## Server
+## Overview
 
-**Hostname:** alpha-node01
+Project Alpha is built from repurposed personal computing hardware.
 
-### Platform
+The physical infrastructure consists of:
 
-- MSI GE76 Raider 11UE
-- Repurposed gaming laptop
-- Ubuntu Server 26.04 LTS
+1. A primary Windows workstation used for administration and virtualization.
+2. A repurposed laptop operating as `alpha-node01`, the primary Project Alpha server.
+3. A dedicated maintenance networking device providing the Maintenance LAN.
 
-### CPU
+---
 
-- Intel Core i7-11800H
-- 8 Cores / 16 Threads
+## Primary Administration Workstation
 
-### Memory
-
-- 16 GB DDR4
-
-### Graphics
-
-- Intel UHD Graphics
-- NVIDIA RTX 3060 Laptop GPU (6 GB)
-
-### Storage
-
-(To be updated)
-
-### Networking
-
-#### Ethernet
-
-Dedicated management network
-
-#### Wi-Fi
-
-Internet connectivity
+The primary workstation is a Windows desktop PC.
 
 ### Role
 
-Project Alpha serves as a self-hosted infrastructure platform for learning:
+The workstation serves as:
 
-- Linux Administration
-- Docker
-- Networking
-- Reverse Proxies
-- DNS
-- VPN
-- Infrastructure Monitoring
-- Automation
-- AI-assisted applications
+- Primary human interface for Project Alpha
+- Windows administration environment
+- Virtualization host
+- Network administration workstation
+- Development workstation
 
----
+The workstation hosts the `alpha-admin` virtual machine.
 
-## Administration Workstation
-
-Primary desktop PC used for:
-
-- SSH Administration
-- Docker management
-- Git
-- Infrastructure documentation
-
----
-
-## Network Equipment
-
-### Dedicated Laboratory Access Point
-
-Purpose:
-
-Provide an isolated management network between the administration workstation and Project Alpha.
-
----
-
-## Future Expansion
-
-- UPS
-- NAS storage
-- Additional Linux nodes
-- Virtualization cluster
+```text
+Windows Workstation
+        │
+        └── alpha-admin
+              └── Ubuntu Desktop VM
