@@ -38,9 +38,9 @@ The original Windows installation was documented with DxDiag before the machine 
 
 ---
 
-## CPU
+# CPU
 
-### Intel Core i7-11800H
+## Intel Core i7-11800H
 
 | Specification | Value |
 |---|---|
@@ -57,9 +57,9 @@ The processor's 8-core / 16-thread configuration provides sufficient CPU capacit
 
 ---
 
-## Memory
+# Memory
 
-### System RAM
+## System RAM
 
 | Specification | Value |
 |---|---|
@@ -156,34 +156,57 @@ The drive became part of the server storage platform following the operating-sys
 
 # Wireless Networking
 
-## Killer Wi-Fi 6E AX1675x 160 MHz
+## Intel AX210
 
-The GE76 Raider includes a Killer Wi-Fi 6E wireless adapter.
+The Project Alpha server uses an Intel AX210 wireless adapter.
 
 | Specification | Value |
 |---|---|
-| Adapter | Killer Wi-Fi 6E AX1675x 160 MHz |
-| Variant | 210NGW |
+| Adapter | Intel AX210 |
 | Interface | Wireless |
-| PCI Device ID | `8086:2725` |
-| Technology | Wi-Fi 6E |
+| Linux Interface | `wlp48s0` |
+| Driver | `iwlwifi` |
+| Project Role | General/Home Network connectivity |
 
-### Project Alpha Role
+## Project Alpha Role
 
-The wireless adapter provides `alpha-node01` with connectivity to the **General/Home Network**.
+The wireless interface provides `alpha-node01` with connectivity to the **General/Home Network**.
 
-Its intended purposes include:
+Its Chapter 1 role includes:
 
 - Internet connectivity
-- Operating-system updates
+- Ubuntu / OS updates
 - Package downloads
-- Docker/container image downloads
-- External dependency acquisition
-- Future remote-access functionality
+- Docker image downloads
+- External dependency access
 
-The Wi-Fi interface is **not the normal administration path** for Project Alpha.
+The Wi-Fi interface is **not the normal Project Alpha administration path**.
 
-Project Alpha administration is intentionally performed through the Maintenance LAN.
+Project Alpha administration is performed through the Ethernet-connected **Maintenance LAN**.
+
+## Chapter 1 Operational State
+
+By the completion of the foundational networking work:
+
+- Wi-Fi was connected to the Home Network.
+- Internet connectivity was operational.
+- The Wi-Fi interface was `wlp48s0`.
+- The server received a Home Network address of `192.168.1.122`.
+- Ethernet remained dedicated to the isolated Project Alpha management network.
+
+The two interfaces intentionally serve different operational roles:
+
+```text
+alpha-node01
+│
+├── Wi-Fi / wlp48s0
+│      └── General/Home Network
+│          └── Internet & external dependencies
+│
+└── Ethernet / enp46s0
+       └── Maintenance LAN
+           └── Project Alpha administration
+```
 
 ---
 
@@ -200,7 +223,7 @@ The GE76 Raider includes a Killer E3100G wired Ethernet controller.
 | Maximum Link Capability | 2.5 GbE |
 | PCI Device ID | `10EC:3000` |
 
-### Project Alpha Role
+## Project Alpha Role
 
 The Ethernet interface provides `alpha-node01` with its connection to the **Maintenance LAN**.
 
@@ -225,8 +248,8 @@ The Maintenance Ethernet connection is used for:
 
 | Physical Interface | Network | Primary Role |
 |---|---|---|
-| Killer Wi-Fi 6E AX1675x | General/Home Network | Internet and external dependencies |
-| Killer E3100G 2.5GbE | Maintenance LAN | Project Alpha administration and services |
+| Intel AX210 | General/Home Network | Internet and external dependencies |
+| Killer E3100G 2.5 GbE | Maintenance LAN | Project Alpha administration and services |
 
 This separation is intentional.
 
@@ -318,9 +341,12 @@ MSI GE76 Raider 11UE
 ├── 16 GB DDR4
 ├── RTX 3060 Laptop GPU
 ├── Samsung ~1 TB NVMe
-├── Wi-Fi 6E
+├── Intel AX210 Wi-Fi
 ├── 2.5 GbE
 └── General-purpose / gaming system
+```
+
+---
 
 # Operating System & Software Platform
 
@@ -346,9 +372,9 @@ The operating system replaced the original Windows installation when the MSI GE7
 
 ---
 
-## Base Operating System
+# Base Operating System
 
-### Ubuntu Server 26.04 LTS
+## Ubuntu Server 26.04 LTS
 
 Ubuntu Server provides the base operating system for `alpha-node01`.
 
@@ -372,3 +398,177 @@ alpha-admin
      │ SSH
      ▼
 alpha-node01
+```
+
+The headless server architecture allows `alpha-node01` to operate without requiring a monitor, keyboard, or mouse during normal operation.
+
+Remote administration is performed from the Project Alpha administration environment.
+
+---
+
+# Administration Workstation
+
+## Windows Workstation
+
+The primary physical administration workstation is the user's Windows desktop computer.
+
+Its role is to provide the primary graphical environment used to manage Project Alpha.
+
+The workstation connects to the Project Alpha infrastructure through the Maintenance LAN environment and hosts the `alpha-admin` virtual machine.
+
+---
+
+# alpha-admin
+
+## Ubuntu Desktop Administration VM
+
+`alpha-admin` is an Ubuntu Desktop virtual machine used as the primary Linux administration environment for Project Alpha.
+
+The VM provides a dedicated administrative environment separate from the Windows host operating system.
+
+Its responsibilities include:
+
+- SSH administration of `alpha-node01`
+- Linux infrastructure management
+- Network troubleshooting
+- Internal DNS testing
+- Internal service testing
+- PKI administration
+- Project Alpha infrastructure development
+
+The VM connects to both the General/Home Network and the Project Alpha Maintenance LAN through separate virtual network interfaces.
+
+---
+
+# Maintenance Router / Access Point
+
+The Project Alpha Maintenance LAN uses a repurposed router/access point as dedicated networking hardware.
+
+Its primary purpose is to provide the isolated Project Alpha Maintenance LAN used for infrastructure administration and internal service communication.
+
+The Maintenance LAN is separate from the General/Home Network.
+
+The hardware therefore provides the physical network boundary between:
+
+```text
+General/Home Network
+        │
+        │ Wi-Fi
+        ▼
+   alpha-node01
+        │
+        │ Ethernet
+        ▼
+Maintenance LAN
+        │
+        ├── Project Alpha infrastructure
+        └── Administration environment
+```
+
+The Maintenance Router / Access Point does not serve as the primary Internet gateway for Project Alpha.
+
+---
+
+# Hardware Architecture Summary
+
+The physical and virtual infrastructure can be summarized as:
+
+```text
+                         General/Home Network
+                                  │
+                                  │ Wi-Fi
+                                  │
+                                  ▼
+                         ┌─────────────────┐
+                         │  alpha-node01   │
+                         │ MSI GE76 Raider │
+                         │                 │
+                         │ Intel AX210     │
+                         │ Killer E3100G   │
+                         └────────┬────────┘
+                                  │
+                                  │ Ethernet
+                                  ▼
+                         ┌─────────────────┐
+                         │ Maintenance     │
+                         │ Router / AP     │
+                         └────────┬────────┘
+                                  │
+                                  │ Maintenance LAN
+                                  │
+                    ┌─────────────┴─────────────┐
+                    │                           │
+                    ▼                           ▼
+             Windows Workstation          Project Alpha
+                    │                     Maintenance LAN
+                    │
+                    │ Virtualization
+                    ▼
+              ┌─────────────┐
+              │ alpha-admin │
+              │ Ubuntu VM   │
+              └─────────────┘
+```
+
+---
+
+# Hardware Design Philosophy
+
+Project Alpha intentionally repurposes existing consumer hardware rather than relying on dedicated enterprise server equipment.
+
+The design demonstrates how a general-purpose laptop can be converted into a functional infrastructure platform by combining:
+
+- Linux
+- Network segmentation
+- Virtualization
+- Containerization
+- Internal DNS
+- Private PKI
+- Reverse proxy infrastructure
+- Remote administration
+- Infrastructure documentation
+
+The physical hardware is therefore only one component of Project Alpha.
+
+The primary objective is to develop practical infrastructure administration experience by building and operating the complete environment.
+
+---
+
+# Current Hardware Role Summary
+
+| Component | Role |
+|---|---|
+| MSI GE76 Raider 11UE | Primary Project Alpha physical server |
+| Intel Core i7-11800H | Primary compute |
+| 16 GB DDR4 | System memory |
+| Samsung ~1 TB NVMe | Primary server storage |
+| Intel AX210 | General/Home Network connectivity |
+| Killer E3100G 2.5 GbE | Maintenance LAN connectivity |
+| RTX 3060 Laptop GPU | Available hardware; not required for current workload |
+| Windows Workstation | Primary physical administration workstation |
+| `alpha-admin` | Ubuntu Desktop administration VM |
+| Maintenance Router / AP | Dedicated Maintenance LAN networking |
+
+---
+
+# Hardware Status
+
+**Physical server:** Operational
+
+**Operating System:** Ubuntu Server 26.04 LTS
+
+**Server Mode:** Headless
+
+**Remote Administration:** SSH operational
+
+**General/Home Network:** Operational
+
+**Maintenance LAN:** Operational
+
+**Dual-Network Operation:** Operational
+
+**Primary Server Host:** `alpha-node01`
+
+**Administration VM:** `alpha-admin`
+
+The hardware foundation for Project Alpha is complete and is now supporting the project's infrastructure services and continued development.
