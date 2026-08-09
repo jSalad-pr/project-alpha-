@@ -2,98 +2,95 @@
 
 ## Overview
 
-Project Alpha is a self-hosted infrastructure environment designed around a dedicated Maintenance LAN.
+Project Alpha is a self-hosted infrastructure environment built around a dedicated physical server, a virtualized Linux administration environment, a Maintenance LAN, and a separate General/Home network connection.
 
-The architecture intentionally separates:
+The architecture intentionally separates two network roles:
 
-1. The **General/Home Network**, which provides external Internet connectivity and access to outside dependencies.
-2. The **Maintenance LAN**, which provides the operational network for Project Alpha administration and internal services.
+1. **Maintenance LAN** — the primary administration and internal-access network for Project Alpha.
+2. **General/Home Network** — the external connectivity path used for Internet access and external dependencies.
 
-The General/Home Network exists as an external connectivity path but is **not used for normal Project Alpha administration**.
+The Maintenance LAN is the normal Project Alpha administration path.
 
-All infrastructure administration is intentionally performed through the Maintenance LAN.
+The General/Home Network is not the normal administration path.
+
+The services themselves run on `alpha-node01` through Docker. The Maintenance LAN provides the network path used to administer and access that infrastructure.
 
 ---
 
-## Architectural Philosophy
+# 1. Architectural Principles
 
-Project Alpha follows a simple principle:
+Project Alpha follows several core architectural principles.
 
-> **External connectivity and infrastructure management are separate concerns.**
+## Separation of Network Roles
 
-The Project Alpha infrastructure is designed to remain operational and administrable through its local Maintenance LAN without requiring the General/Home Network for normal management.
+The project uses two network paths with intentionally different purposes.
 
-The General/Home Network exists primarily to provide:
-
-- Internet connectivity
-- Operating-system updates
-- Package downloads
-- Container image downloads
-- External dependency acquisition
-- Future remote-access capabilities
+### Maintenance LAN
 
 The Maintenance LAN provides:
 
 - SSH administration
 - Server administration
 - Docker administration
-- Service configuration
+- Internal service access
 - Internal DNS
 - Private PKI administration
-- Internal service access
 - Infrastructure troubleshooting
-- Local WireGuard access
+- Local infrastructure management
 
-Although the General/Home Network and Maintenance LAN can technically provide paths between systems, the General/Home Network is **not an authorized or intended administration path**.
+Normal Project Alpha administration occurs through this network.
+
+### General/Home Network
+
+The General/Home Network provides:
+
+- Internet connectivity
+- Ubuntu / operating-system updates
+- Package downloads
+- Docker image downloads
+- External dependencies
+- External connectivity required by infrastructure services
+- Future remote-access capabilities
+
+The General/Home Network is not the normal Project Alpha administration path.
 
 ---
 
-# High-Level Topology
+# 2. Physical and Virtual Architecture
+
+The Project Alpha administration environment begins with the physical Windows workstation.
+
+The workstation hosts the `alpha-admin` Ubuntu Desktop virtual machine.
+
+`alpha-admin` is the Linux administration environment used to manage the Project Alpha infrastructure.
+
+The physical topology is:
 
 ```text
-                         WINDOWS WORKSTATION
-                    ┌────────────────────────┐
-                    │       Windows OS       │
-                    │                        │
-                    │  ┌──────────────────┐  │
-                    │  │   alpha-admin    │  │
-                    │  │ Ubuntu Desktop VM │  │
-                    │  └────────┬─────────┘  │
-                    └───────────┼────────────┘
-                                │
-                         Wi-Fi / Shared
-                       Network Connectivity
-                                │
-                                ▼
-                     ┌──────────────────────┐
-                     │   MAINTENANCE LAN    │
-                     │                      │
-                     │ Project Alpha        │
-                     │ Management Network   │
-                     └──────────┬───────────┘
-                                │
-                             Ethernet
-                                │
-                                ▼
-                     ┌──────────────────────┐
-                     │     alpha-node01     │
-                     │     Ubuntu Server    │
-                     │                      │
-                     │      Dual-Homed      │
-                     └──────────┬───────────┘
-                                │
-                           Docker Engine
-                                │
-                ┌───────────────┼────────────────┐
-                │               │                │
-            Portainer      Uptime Kuma       Vaultwarden
-                │               │                │
-                ├───────────────┼────────────────┤
-                │               │                │
-          Nginx Proxy      AdGuard Home       Step CA
-            Manager
-                │
-            WireGuard
-                │
-                ▼
-         Internal Services
+Windows Workstation
+        │
+        │ hosts
+        ▼
+┌─────────────────┐
+│   alpha-admin   │
+│ Ubuntu Desktop  │
+│       VM        │
+└────────┬────────┘
+         │
+       Wi-Fi
+         │
+         ▼
+┌──────────────────────┐
+│ Maintenance Router / │
+│        Access Point  │
+└──────────┬───────────┘
+           │
+        Ethernet
+           │
+           ▼
+┌──────────────────────┐
+│     alpha-node01     │
+│    Ubuntu Server     │
+│                      │
+│  Ethernet + Wi-Fi    │
+└──────────────────────┘
