@@ -21,11 +21,11 @@ The deployment included:
 - Integration with the shared Docker network.
 - Validation of reverse proxy functionality for hosted services.
 
-The reverse proxy was configured to support future expansion as additional applications are introduced into Project Alpha.
+The reverse proxy was configured to provide centralized routing for web-based applications and to support future expansion as additional services are introduced into Project Alpha.
 
 ## Outcome
 
-Project Alpha gained centralized web application routing, reducing the need to expose multiple service ports while creating a unified method for accessing self-hosted applications.
+Project Alpha gained centralized web application routing, reducing the need to access supported services through individual service ports.
 
 The reverse proxy became a core infrastructure component supporting the continued growth of the platform.
 
